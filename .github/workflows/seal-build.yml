@@ -1,0 +1,34 @@
+name: seal-build
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 8, 11, 21 and 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: |
+            8.0.402
+            11.0.22
+            21.0.2
+            17.0.10
+
+      - name: Build bcutil jar
+        run: |
+          export BC_JDK8="$JAVA_HOME_8_X64" BC_JDK11="$JAVA_HOME_11_X64" BC_JDK17="$JAVA_HOME_17_X64" BC_JDK21="$JAVA_HOME_21_X64"
+          export JAVA_HOME="$JAVA_HOME_17_X64"
+          ./gradlew --no-daemon --console=plain -s --init-script ci/seal-init.gradle :util:jar
+          ls -l util/build/libs
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bcutil-jdk18on-jar
+          path: util/build/libs/bcutil-jdk18on-1.78.jar
+          if-no-files-found: error

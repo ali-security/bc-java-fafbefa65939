@@ -129,6 +129,8 @@ public class GOSTR3410_2012_256CmsSignVerifyDetached
 
                     params.addCertStore(certStoreBuilder.build());
                     params.setRevocationEnabled(false);
+                    // signer cert expired 2025-02-07: validate as of the 1.78 release date
+                    params.setDate(new java.util.Date(1712391014000L));
                     certPathBuilder.build(params);
                     result = true;
                 }
